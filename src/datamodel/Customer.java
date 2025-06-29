@@ -1,55 +1,90 @@
 package datamodel;
 
+import java.util.*;
 
+/**
+ * Class of entity type <i>Customer</i>.
+ * <p>
+ * Customer is a person who creates and holds (owns) orders in the system.
+ * </p>
+ * 
+ * @version {@value application.package_info#Version}
+ * @author Luanne
+ */
 public class Customer {
 
-    public Customer() { }
+    private long id = -1L; // Unique id, can be set only once
+    private String lastName = ""; // Never null
+    private String firstName = ""; // Never null
+    private final List<String> contacts = new ArrayList<>();
 
-    public Customer(String name) { }
+    public Customer() {
+        // Default constructor
+    }
 
+    /**
+     * Constructor with single-String name argument.
+     * @param name single-String Customer name, e.g. "Eric Meyer"
+     * @throws IllegalArgumentException if name argument is null
+     */
+    public Customer(String name) {
+        setName(name);
+    }
 
     public long getId() {
-        return 0L;
+        return id;
     }
 
     public Customer setId(long id) {
+        if (this.id >= 0 || id < 0)
+            throw new IllegalArgumentException("Invalid or already set ID");
+        this.id = id;
         return this;
     }
 
     public String getLastName() {
-        return "";
+        return lastName;
     }
 
     public String getFirstName() {
-        return "";
+        return firstName;
     }
 
     public Customer setName(String first, String last) {
+        if (first != null) this.firstName = trim(first);
+        if (last != null) this.lastName = trim(last);
         return this;
     }
 
     public Customer setName(String name) {
+        splitName(name);
         return this;
     }
 
     public int contactsCount() {
-        return 0;
+        return contacts.size();
     }
 
     public Iterable<String> getContacts() {
-        return java.util.List.of();
+        return contacts;
     }
 
     public Customer addContact(String contact) {
+        if (contact == null || contact.isBlank())
+            throw new IllegalArgumentException("Invalid contact");
+        contact = trim(contact);
+        if (!contacts.contains(contact))
+            contacts.add(contact);
         return this;
     }
 
     public void deleteContact(int i) {
-        throw new UnsupportedOperationException("method deleteContact(i) has not yet been implemented");
+        if (i >= 0 && i < contacts.size())
+            contacts.remove(i);
     }
 
     public void deleteAllContacts() {
-        throw new UnsupportedOperationException("method deleteAllContacts() has not yet been implemented");
+        contacts.clear();
     }
 
     /**
@@ -95,19 +130,36 @@ public class Customer {
      * @param name single-String name to split into first- and last name parts
      * @throws IllegalArgumentException if name argument is null or empty
      */
-    public void splitName(String name) {
-        throw new UnsupportedOperationException("method splitName(name) has not yet been implemented");
+     public void splitName(String name) {
+        if (name == null || name.isBlank())
+            throw new IllegalArgumentException("Name cannot be null or blank");
+
+        name = trim(name);
+        String[] parts;
+        if (name.contains(",") || name.contains(";")) {
+            parts = name.split("[,;]", 2);
+            lastName = trim(parts[0]);
+            firstName = trim(parts[1]);
+        } else {
+            parts = name.trim().split("\\s+");
+            if (parts.length == 1) {
+                firstName = parts[0];
+                lastName = "";
+            } else {
+                lastName = parts[parts.length - 1];
+                firstName = String.join(" ", Arrays.copyOf(parts, parts.length - 1));
+            }
+        }
     }
 
     /**
-     * Trim leading and trailing white spaces {@code [\s]}, commata {@code [,;]}
-     * and quotes {@code ["']} from a String (used for names and contacts).
+     * Trim leading and trailing white spaces, commata and quotes from a String.
      * @param s String to trim
      * @return trimmed String
      */
     private String trim(String s) {
-        s = s.replaceAll("^[\\s\"',;]*", "");   // trim leading white spaces[\s], commata[,;] and quotes['"]
-        s = s.replaceAll( "[\\s\"',;]*$", "");  // trim trailing accordingly
+        s = s.replaceAll("^[\\s\"',;]*", "");
+        s = s.replaceAll("[\\s\"',;]*$", "");
         return s;
     }
 }

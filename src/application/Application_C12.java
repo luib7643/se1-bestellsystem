@@ -26,7 +26,7 @@ public class Application_C12 implements Runner {
         // 
         final Customer eric = new Customer("Eric Meyer")
             .setId(892474L)     // set id, first time
-            .setId(947L)        // ignored, since id can only be set once
+        //    .setId(947L)        // ignored, since id can only be set once
             .addContact("eric98@yahoo.com")
             .addContact("eric98@yahoo.com") // ignore duplicate contact
             .addContact("(030) 3945-642298");
